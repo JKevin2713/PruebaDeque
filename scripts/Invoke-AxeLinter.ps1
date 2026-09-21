@@ -26,7 +26,7 @@ if ([string]::IsNullOrWhiteSpace($apiKey)) {
 
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
-# Extensiones que soporta el linter (HTML, JSX/TSX, Vue, Markdown...). Aquí solo HTML.
+# Extensiones que soporta el linter
 $files = Get-ChildItem -Path $Path -Recurse -File -Include *.html, *.htm, *.jsx, *.tsx, *.vue
 $totalErrors = 0
 $summary = @()
@@ -44,33 +44,40 @@ foreach ($file in $files) {
         -ContentType 'application/json; charset=utf-8' `
         -Body $body
 
-    # Guardamos la respuesta cruda: útil para conocer el formato exacto.
+    # Guardamos la respuesta cruda
     $response | ConvertTo-Json -Depth 20 |
         Set-Content -Path (Join-Path $OutDir "linter-$($file.Name).json") -Encoding utf8
 
-    # Formato esperado: { report: { errors: [ ... ] } }. Si cambia, revisa el JSON guardado.
+    # Formato esperado: { report: { errors: [ ... ] } }
     $errors = @()
-    if ($response.report -and $response.report.errors) { $errors = @($response.report.errors) }
-
-    foreach ($e in $errors) {
-        $line = if ($e.lineNumber) { $e.lineNumber } else { '?' }
-        $rule = if ($e.ruleId) { $e.ruleId } else { 'regla' }
-        $desc = if ($e.description) { $e.description } else { ($e | ConvertTo-Json -Compress) }
-        Write-Host "  [$rule] línea ${line}: $desc"
+    if ($response.report -and$response.report.errors) { 
+        $errors = @($response.report.errors) 
     }
 
-    $totalErrors += $errors.Count
+    foreach ($e in $errors) {$line = '?'
+        if ($e.lineNumber) { $line =$e.lineNumber }
+
+        $rule = 'regla'
+        if ($e.ruleId) { $rule =$e.ruleId }
+
+        $desc = ($e | ConvertTo-Json -Compress)
+        if ($e.description) { $desc =$e.description }
+
+        Write-Host "  [$rule] línea ${line}:$desc"
+    }
+
+    $totalErrors +=$errors.Count
     $summary += "| $($file.Name) | $($errors.Count) |"
 }
 
-# Resumen visible en la pestaña del workflow.
+# Resumen visible en la pestaña del workflow
 if ($env:GITHUB_STEP_SUMMARY) {
     @('## axe DevTools Linter', '', '| Archivo | Errores |', '|---|---|') + $summary |
         Add-Content -Path $env:GITHUB_STEP_SUMMARY
 }
 
 Write-Host "Total de errores: $totalErrors"
-if ($FailOnViolations -and $totalErrors -gt 0) {
+if ($FailOnViolations -and$totalErrors -gt 0) {
     Write-Host "::error::Se encontraron $totalErrors errores de accesibilidad."
     exit 1
 }
