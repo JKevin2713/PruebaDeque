@@ -1,0 +1,85 @@
+name: Accessibility
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      fail_on_violations:
+        description: 'Fallar el workflow si hay violaciones'
+        type: boolean
+        default: false
+      run_devtools_cli:
+        description: 'Ejecutar también axe DevTools CLI (requiere cuenta Agora)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  # 1) Análisis estático del código con la API de axe DevTools Linter (requiere API key)
+  axe-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: axe DevTools Linter (API)
+        shell: pwsh
+        env:
+          AXE_LINTER_API_KEY: ${{ secrets.AXE_LINTER_API_KEY }}
+        run: ./scripts/Invoke-AxeLinter.ps1 -Path ./src ${{ inputs.fail_on_violations && '-FailOnViolations' || '' }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: axe-linter-results
+          path: axe-results/
+          if-no-files-found: ignore
+
+  # 2) Análisis en navegador con axe-core (open source, sin cuenta): ideal para probar el pipeline
+  axe-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: axe-core CLI
+        shell: pwsh
+        run: ./scripts/Invoke-AxeCoreScan.ps1 ${{ inputs.fail_on_violations && '-FailOnViolations' || '' }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: axe-core-results
+          path: axe-results/
+          if-no-files-found: ignore
+
+  # 3) axe DevTools for Web CLI (comercial): solo se ejecuta manualmente
+  axe-devtools-cli:
+    if: ${{ inputs.run_devtools_cli }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: axe DevTools CLI
+        shell: pwsh
+        env:
+          AGORA_EMAIL: ${{ secrets.AGORA_EMAIL }}
+          AGORA_IDENTITY_TOKEN: ${{ secrets.AGORA_IDENTITY_TOKEN }}
+          AXE_DEVHUB_API_KEY: ${{ secrets.AXE_DEVHUB_API_KEY }}
+          AXE_DEVHUB_PROJECT_ID: ${{ vars.AXE_DEVHUB_PROJECT_ID }}
+        run: ./scripts/Invoke-AxeDevToolsCli.ps1
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: axe-devtools-cli-results
+          path: axe-results/
+          if-no-files-found: ignore

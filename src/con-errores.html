@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<!-- ERRORES INTENCIONALES, para que las herramientas encuentren algo:
+     1) <html> sin atributo lang
+     2) <img> sin alt
+     3) <input> sin etiqueta
+     4) botones sin nombre accesible
+     5) texto con bajo contraste
+     6) enlace vacío
+     7) tabindex positivo -->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora con errores</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <h1>Calculadora</h1>
+    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" width="40" height="40">
+    <input type="text">
+    <div class="display" data-display></div>
+    <div class="keys">
+      <button data-key="1" tabindex="5">1</button>
+      <button data-key="2">2</button>
+      <button data-key="+" class="op"><i></i></button>
+      <button data-key="C"></button>
+    </div>
+    <p class="hint" style="color:#bbbbbb">Texto gris claro sobre fondo blanco (poco contraste).</p>
+    <a href="index.html"></a>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

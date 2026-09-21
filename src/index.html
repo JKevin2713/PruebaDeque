@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora accesible</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <h1>Calculadora</h1>
+    <div class="display" data-display role="status" aria-live="polite" aria-label="Resultado"></div>
+    <div class="keys">
+      <button type="button" data-key="C" aria-label="Borrar todo">C</button>
+      <button type="button" data-key="7">7</button>
+      <button type="button" data-key="8">8</button>
+      <button type="button" data-key="9">9</button>
+      <button type="button" class="op" data-key="/" aria-label="Dividir">&divide;</button>
+      <button type="button" data-key="4">4</button>
+      <button type="button" data-key="5">5</button>
+      <button type="button" data-key="6">6</button>
+      <button type="button" class="op" data-key="*" aria-label="Multiplicar">&times;</button>
+      <button type="button" data-key="1">1</button>
+      <button type="button" data-key="2">2</button>
+      <button type="button" data-key="3">3</button>
+      <button type="button" class="op" data-key="-" aria-label="Restar">&minus;</button>
+      <button type="button" data-key="0">0</button>
+      <button type="button" data-key="." aria-label="Punto decimal">.</button>
+      <button type="button" class="op" data-key="=" aria-label="Igual">=</button>
+      <button type="button" class="op" data-key="+" aria-label="Sumar">+</button>
+    </div>
+    <p class="hint"><a href="con-errores.html">Ver la versión con errores de accesibilidad</a></p>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
