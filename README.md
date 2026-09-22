@@ -1,4 +1,4 @@
-# Demo de accesibilidad con Deque (axe) + GitHub Actions + PowerShell
+# Demo de accesibilidad con Deque 
 
 Calculadora mínima (HTML/CSS/JS) para probar herramientas de accesibilidad de Deque.
 
